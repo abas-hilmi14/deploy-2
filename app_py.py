@@ -49,3 +49,5 @@ if st.button("🔍 Prediksi"):
         "Confidence": [f"{p*100:.2f}%" for p in proba_all]
     })
     st.dataframe(proba_df.set_index("Kelas"))
+
+st.write("📉 Decision function score:", model.decision_function(input_scaled))
