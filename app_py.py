@@ -18,7 +18,7 @@ st.subheader("📝 Input Nilai Mata Kuliah")
 user_input = []
 
 for feature in selected_features:
-    val = st.number_input(f"{feature}", min_value=80.0, max_value=100.0, step=0.1)
+    val = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
     user_input.append(val)
 
 if st.button("🔍 Prediksi"):
@@ -28,7 +28,9 @@ if st.button("🔍 Prediksi"):
     # Normalisasi
     input_scaled = scaler.transform(input_df)
 
-
+    # Debug: tampilkan bentuk input dan ekspektasi model
+    st.write("📊 Shape input_scaled:", input_scaled.shape)
+    st.write("📊 Expected features by model:", model.n_features_in_)
 
     # Validasi jumlah fitur
     if input_scaled.shape[1] != model.n_features_in_:
@@ -43,10 +45,7 @@ if st.button("🔍 Prediksi"):
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum()
 
-        classes = model.classes_  # [0, 1] atau bisa [1, 2] dst
-        class_index = list(classes).index(prediction)
-        proba = softmax(decision_scores)[class_index]
-
+        proba = softmax(decision_scores)[prediction]
         predicted_label = label_encoder.inverse_transform([prediction])[0]
 
         # Output
