@@ -43,7 +43,10 @@ if st.button("🔍 Prediksi"):
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum()
 
-        proba = softmax(decision_scores)[prediction]
+        classes = model.classes_  # [0, 1] atau bisa [1, 2] dst
+        class_index = list(classes).index(prediction)
+        proba = softmax(decision_scores)[class_index]
+
         predicted_label = label_encoder.inverse_transform([prediction])[0]
 
         # Output
