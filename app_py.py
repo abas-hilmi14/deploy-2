@@ -32,6 +32,15 @@ if st.button("🔍 Prediksi"):
     # Prediksi label & probabilitas
     prediction = model.predict(input_scaled)[0]
     proba_all = model.predict_proba(input_scaled)[0]
+    # Debug confidence semua kelas
+    st.write("📉 Confidence (predict_proba):", proba_all)
+    
+    # (Opsional) Tampilkan sebagai tabel
+    proba_df = pd.DataFrame({
+        "Kelas": label_encoder.inverse_transform(model.classes_),
+        "Confidence": [f"{p*100:.2f}%" for p in proba_all]
+    })
+    st.dataframe(proba_df.set_index("Kelas"))
 
     # Ambil confidence sesuai kelas hasil prediksi
     class_index = list(model.classes_).index(prediction)
