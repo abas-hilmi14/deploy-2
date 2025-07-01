@@ -22,33 +22,37 @@ selected_features = joblib.load("selected_features.pkl")  # list nama kolom fitu
 st.title("🎓 Klasifikasi Topik Skripsi Mahasiswa")
 st.write("Masukkan nilai mata kuliah untuk memprediksi kecenderungan topik skripsi berdasarkan kemampuan akademik.")
 
-# === Input fitur dari user ===
-user_input = {}
+# Ambil fitur terpilih dari file .pkl
+selected_features = joblib.load("selected_features.pkl")  # list nama kolom yang dipakai model
+
+# Buat form input untuk setiap fitur yang dipakai model
 st.subheader("📝 Masukkan Nilai Mata Kuliah")
+
+# Simpan input user
+user_input = []
 for feature in selected_features:
-    user_input[feature] = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
+    val = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
+    user_input.append(val)
 
-# === Prediksi ===
+# Konversi ke array
 if st.button("🔍 Prediksi Topik Skripsi"):
-    input_df = pd.DataFrame([user_input])
+    input_df = pd.DataFrame([user_input], columns=selected_features)
 
-    # Normalisasi dengan scaler Z-Score
+    # Normalisasi
     input_scaled = scaler.transform(input_df)
 
-    # Prediksi label
+    # Prediksi
     prediction = model.predict(input_scaled)[0]
     prediction_proba = model.decision_function(input_scaled)
 
-    # Konversi ke nama label asli
-    predicted_label = label_encoder.inverse_transform([prediction])[0]
-
-    # Hitung confidence (untuk SVM, pakai jarak decision function → softmax agar jadi probabilitas)
+    # Confidence
     def softmax(x):
         e_x = np.exp(x - np.max(x))
         return e_x / e_x.sum()
 
     proba = softmax(prediction_proba)[prediction]
+    predicted_label = label_encoder.inverse_transform([prediction])[0]
 
-    # === Tampilkan Hasil ===
+    # Output
     st.success(f"📌 Prediksi: **{predicted_label}**")
     st.info(f"🤖 Tingkat Keyakinan Model: **{proba * 100:.2f}%**")
