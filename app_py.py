@@ -28,9 +28,7 @@ if st.button("🔍 Prediksi"):
     # Normalisasi
     input_scaled = scaler.transform(input_df)
 
-    # Debug: tampilkan bentuk input dan ekspektasi model
-    st.write("📊 Shape input_scaled:", input_scaled.shape)
-    st.write("📊 Expected features by model:", model.n_features_in_)
+
 
     # Validasi jumlah fitur
     if input_scaled.shape[1] != model.n_features_in_:
