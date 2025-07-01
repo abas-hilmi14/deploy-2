@@ -40,15 +40,24 @@ if st.button("🔍 Prediksi"):
         prediction = model.predict(input_scaled)[0]
         decision_scores = model.decision_function(input_scaled)
         
-        # Confidence pakai softmax + class index mapping
+        # Softmax helper
         def softmax(x):
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum()
         
-        classes = model.classes_  # daftar label kelas seperti [0, 1]
-        class_index = list(classes).index(prediction)  # ambil indeks ke-n dari prediksi
-        proba = softmax(decision_scores)[class_index]
+        # Ambil confidence berdasarkan tipe klasifikasi
+        if len(model.classes_) == 2:
+            # Binary classification → decision_function hasil 1 dimensi
+            proba = float(1 / (1 + np.exp(-decision_scores[0])))  # sigmoid
+            predicted_index = list(model.classes_).index(prediction)
+            if predicted_index == 0:
+                proba = 1 - proba  # ambil probabilitas untuk prediksi kelas 0
+        else:
+            # Multiclass → pakai softmax
+            class_index = list(model.classes_).index(prediction)
+            proba = softmax(decision_scores)[class_index]
         
+                
         # Konversi ke label asli
         predicted_label = label_encoder.inverse_transform([prediction])[0]
         
