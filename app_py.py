@@ -36,18 +36,23 @@ if st.button("🔍 Prediksi"):
     if input_scaled.shape[1] != model.n_features_in_:
         st.error(f"❌ Jumlah fitur tidak sesuai. Model mengharapkan {model.n_features_in_} fitur, tetapi Anda memasukkan {input_scaled.shape[1]}.")
     else:
-        # Prediksi
+        # Prediksi label
         prediction = model.predict(input_scaled)[0]
         decision_scores = model.decision_function(input_scaled)
-
-        # Softmax confidence
+        
+        # Confidence pakai softmax + class index mapping
         def softmax(x):
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum()
-
-        proba = softmax(decision_scores)[prediction]
+        
+        classes = model.classes_  # daftar label kelas seperti [0, 1]
+        class_index = list(classes).index(prediction)  # ambil indeks ke-n dari prediksi
+        proba = softmax(decision_scores)[class_index]
+        
+        # Konversi ke label asli
         predicted_label = label_encoder.inverse_transform([prediction])[0]
-
+        
         # Output
         st.success(f"📌 Prediksi: **{predicted_label}**")
         st.info(f"🤖 Tingkat Keyakinan Model: **{proba * 100:.2f}%**")
+
