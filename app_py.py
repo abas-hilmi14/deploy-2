@@ -7,43 +7,47 @@ import joblib
 model = joblib.load("model_svm.pkl")
 scaler = joblib.load("scaler.pkl")
 label_encoder = joblib.load("label_encoder.pkl")
-selected_features = joblib.load("selected_features.pkl")  # list nama kolom fitur yang digunakan
+selected_features = joblib.load("selected_features.pkl")  # list of 10 features
 
-# Judul aplikasi
+# Judul
 st.title("🎓 Prediksi Topik Skripsi Mahasiswa")
-st.markdown("Masukkan nilai mata kuliah untuk memprediksi kecenderungan topik skripsi berdasarkan kemampuan akademik.")
+st.markdown("Masukkan nilai mata kuliah untuk memprediksi topik skripsi berdasarkan kemampuan akademik.")
 
-# Input nilai mata kuliah
-st.subheader("📝 Masukkan Nilai Mata Kuliah")
+# Ambil input user
+st.subheader("📝 Input Nilai Mata Kuliah")
 user_input = []
 
-# Buat input sesuai urutan selected_features
 for feature in selected_features:
-    value = st.number_input(f"{feature}", min_value=80.0, max_value=100.0, step=0.1)
-    user_input.append(value)
+    val = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
+    user_input.append(val)
 
-# Prediksi ketika tombol ditekan
 if st.button("🔍 Prediksi"):
-    # Konversi input jadi DataFrame
+    # Konversi ke DataFrame (1 baris, kolom = selected_features)
     input_df = pd.DataFrame([user_input], columns=selected_features)
 
-    # Normalisasi (Z-score)
+    # Normalisasi
     input_scaled = scaler.transform(input_df)
 
-    # Prediksi label
-    prediction = model.predict(input_scaled)[0]
-    decision_scores = model.decision_function(input_scaled)
+    # Debug: tampilkan bentuk input dan ekspektasi model
+    st.write("📊 Shape input_scaled:", input_scaled.shape)
+    st.write("📊 Expected features by model:", model.n_features_in_)
 
-    # Confidence menggunakan softmax
-    def softmax(x):
-        e_x = np.exp(x - np.max(x))
-        return e_x / e_x.sum()
+    # Validasi jumlah fitur
+    if input_scaled.shape[1] != model.n_features_in_:
+        st.error(f"❌ Jumlah fitur tidak sesuai. Model mengharapkan {model.n_features_in_} fitur, tetapi Anda memasukkan {input_scaled.shape[1]}.")
+    else:
+        # Prediksi
+        prediction = model.predict(input_scaled)[0]
+        decision_scores = model.decision_function(input_scaled)
 
-    proba = softmax(decision_scores)[prediction]
+        # Softmax confidence
+        def softmax(x):
+            e_x = np.exp(x - np.max(x))
+            return e_x / e_x.sum()
 
-    # Konversi prediksi ke label asli
-    predicted_label = label_encoder.inverse_transform([prediction])[0]
+        proba = softmax(decision_scores)[prediction]
+        predicted_label = label_encoder.inverse_transform([prediction])[0]
 
-    # Tampilkan hasil
-    st.success(f"📌 Prediksi Topik Skripsi: **{predicted_label}**")
-    st.info(f"🤖 Tingkat Keyakinan Model: **{proba * 100:.2f}%**")
+        # Output
+        st.success(f"📌 Prediksi: **{predicted_label}**")
+        st.info(f"🤖 Tingkat Keyakinan Model: **{proba * 100:.2f}%**")
