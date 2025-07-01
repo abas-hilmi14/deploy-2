@@ -50,3 +50,12 @@ if st.button("🔍 Prediksi"):
     })
     st.dataframe(proba_df.set_index("Kelas"))
     st.write("📉 Z-Score Input:", input_scaled)
+    st.write("Classes in model:", model.classes_)
+    st.write("Predicted class index:", prediction)
+    st.write("Probabilities:", proba_all)
+
+    st.write("Input (scaled):", input_scaled)
+    st.write("Mean of scaler:", scaler.mean_)
+    st.write("Std dev of scaler:", scaler.scale_)
+
+
