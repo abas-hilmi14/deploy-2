@@ -19,7 +19,7 @@ user_input = []
 
 # Buat input sesuai urutan selected_features
 for feature in selected_features:
-    value = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
+    value = st.number_input(f"{feature}", min_value=80.0, max_value=100.0, step=0.1)
     user_input.append(value)
 
 # Prediksi ketika tombol ditekan
