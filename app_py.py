@@ -18,7 +18,7 @@ st.subheader("📝 Input Nilai Mata Kuliah")
 user_input = []
 
 for feature in selected_features:
-    val = st.number_input(f"{feature}", min_value=0.0, max_value=100.0, step=0.1)
+    val = st.number_input(f"{feature}", min_value=80.0, max_value=100.0, step=0.1)
     user_input.append(val)
 
 if st.button("🔍 Prediksi"):
